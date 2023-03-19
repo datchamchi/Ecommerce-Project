@@ -1,0 +1,8 @@
+/node_modules
+config.env
+/utils
+
+/controllers
+/node_modules 
+/routes
+/models
