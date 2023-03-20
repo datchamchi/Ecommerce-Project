@@ -5,6 +5,12 @@ const handleValidator = (err, res) =>
     status: "fail",
     message: "Cannot create the model ",
   });
+const handleCastError = (err, res) => {
+  res.status(err.statusCode).json({
+    status: "fail",
+    nessage: "Invalid id",
+  });
+};
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -16,6 +22,11 @@ const sendErrorDev = (err, res) => {
 
 const sendErrorProd = (err, res) => {
   if (err.name === "ValidationError") handleValidator(err, res);
+  else if (err.name === "CastError") handleCastError(err, res);
+  res.status(err.statusCode).json({
+    status: err.status,
+    err: err.message,
+  });
 };
 const errorHandle = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;

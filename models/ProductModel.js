@@ -10,6 +10,12 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       required: [true, "Must have image cover for product"],
     },
+    filename: {
+      type: String,
+    },
+    description: {
+      type: String,
+    },
     photo: [String],
     size: {
       type: String,
