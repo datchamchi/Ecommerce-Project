@@ -44,12 +44,20 @@ const ProductSchema = new mongoose.Schema(
     },
     ratingsQuantity: Number,
     slug: String,
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 ProductSchema.virtual("price").get(function () {
   return (1 - this.priceSale) * this.priceOrigin;
 });
+// ProductSchema.pre(/^find/, function (next) {
+//   this.price = (1 - this.priceSale) * this.priceOrigin;
+//   next();
+// });
 ProductSchema.pre("save", function (next) {
   this.slug = slugify(this.name, {
     lower: true,

@@ -4,7 +4,7 @@ const Product = require("./../models/ProductModel");
 const catchAsync = require("./../utils/catchAsync");
 const generalHandle = require("./generalHandle");
 
-exports.createProduct = generalHandle.createOne(Product);
+exports.createProduct = generalHandle.createOne(Product, "product");
 exports.getAllProduct = generalHandle.getAll(
   Product,
   "-photo",

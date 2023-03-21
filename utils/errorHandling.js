@@ -1,15 +1,17 @@
 require("dotenv").config();
 
-const handleValidator = (err, res) =>
-  res.status(err.statusCode).json({
-    status: "fail",
-    message: "Cannot create the model ",
-  });
+const handleValidator = (err, res) => {
+  (err.statusCode = err.status = "fail"),
+    (err.message = "Cannot create the model ");
+};
+
 const handleCastError = (err, res) => {
-  res.status(err.statusCode).json({
-    status: "fail",
-    nessage: "Invalid id",
-  });
+  err.statusCode = 404;
+  (err.status = "fail"), (err.message = "Invalid id");
+};
+const handleDupplicateValue = (err, res) => {
+  err.statusCode = 500;
+  (err.status = "fail"), (err.message = "Duplicate value");
 };
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -23,6 +25,7 @@ const sendErrorDev = (err, res) => {
 const sendErrorProd = (err, res) => {
   if (err.name === "ValidationError") handleValidator(err, res);
   else if (err.name === "CastError") handleCastError(err, res);
+  else if (err.code === 11000) handleDupplicateValue(err, res);
   res.status(err.statusCode).json({
     status: err.status,
     err: err.message,
