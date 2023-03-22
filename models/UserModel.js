@@ -32,6 +32,7 @@ const UserSchema = new mongoose.Schema({
       message: "PasswordConfirm and Password is not the same.",
     },
   },
+  passwordChangedAt: Date,
   imageCover: {
     type: String,
   },
@@ -39,10 +40,14 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
 });
+UserSchema.methods.comparePassword = async function (password, passwordHash) {
+  return await bcrypt.compare(password, passwordHash);
+};
 UserSchema.pre("save", async function (next) {
   if (this.isModified("password") || this.isNew()) {
     this.password = await bcrypt.hash(this.password, 10);
     this.passwordConfirm = undefined;
+    this.passwordChangedAt = Date.now();
   }
 });
 const User = mongoose.model("User", UserSchema);
