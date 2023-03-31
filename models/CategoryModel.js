@@ -1,5 +1,6 @@
-const { Schema, default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const slugify = require("slugify");
+
 const CategorySchema = new mongoose.Schema(
   {
     ma: {

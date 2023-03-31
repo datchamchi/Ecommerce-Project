@@ -1,8 +1,11 @@
 require("dotenv").config();
 
 const handleValidator = (err, res) => {
-  (err.statusCode = err.status = "fail"),
-    (err.message = "Cannot create the model ");
+  err.statusCode = 400;
+  err.status = "fail";
+  let message = "";
+  Object.values(err.errors).forEach((el) => (message += el.message + ". "));
+  err.message = message;
 };
 
 const handleCastError = (err, res) => {

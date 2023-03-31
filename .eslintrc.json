@@ -9,10 +9,10 @@
       }
     ],
     "import/no-extraneous-dependencies": [
-      "off",
+      "error",
       { "devDependencies": ["**/*.test.js", "**/*.spec.js"] }
     ],
-    "arrow-body-style": ["error", "no"],
+    // "arrow-body-style": ["error", "no"],
     // "import/newline-after-import": ["no", { "count": 2 }],
     "spaced-comment": "off",
     "no-console": "warn",

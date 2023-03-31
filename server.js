@@ -18,9 +18,7 @@ mongoose
   .catch(() => {
     console.log("ERROR 💥");
   });
-// Use app
 
-//
 app.listen(PORT, () => {
   console.log(`Server starting at PORT ${PORT}`);
   console.log(process.env.NODE_ENV);

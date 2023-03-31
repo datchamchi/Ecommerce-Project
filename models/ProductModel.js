@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
+
 const ProductSchema = new mongoose.Schema(
   {
     name: {
@@ -34,6 +35,7 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    price: Number,
     quantity: {
       type: Number,
       required: true,
@@ -51,19 +53,31 @@ const ProductSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-ProductSchema.virtual("price").get(function () {
-  return (1 - this.priceSale) * this.priceOrigin;
-});
-// ProductSchema.pre(/^find/, function (next) {
-//   this.price = (1 - this.priceSale) * this.priceOrigin;
-//   next();
+// ProductSchema.virtual("price").get(function () {
+//   return (1 - this.priceSale) * this.priceOrigin;
 // });
+
+ProductSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "category",
+    select: "name",
+  });
+  next();
+});
+
 ProductSchema.pre("save", function (next) {
+  // console.log(this.createdAt);   // using timestamps (createdAt + updatedAt)
+  this.price = (1 - this.priceSale) * this.priceOrigin;
   this.slug = slugify(this.name, {
     lower: true,
     replacement: "-",
   });
   next();
+});
+ProductSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "product",
 });
 const Product = mongoose.model("Product", ProductSchema);
 module.exports = Product;
