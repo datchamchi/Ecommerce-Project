@@ -2,8 +2,7 @@ const jwt = require("jsonwebtoken");
 const catchAsync = require("./../utils/catchAsync");
 const generalHandle = require("./generalHandle");
 const AppError = require("./../utils/appError");
-const client = require("./../utils/initRedis");
-
+// const client = require("./../utils/initRedis");
 const User = require("./../models/UserModel");
 const signToken = require("./../utils/service_token");
 const sendEmail = require("./../utils/sendEmail");
@@ -12,7 +11,7 @@ require("dotenv").config();
 // authentication : login ,sign in, resetPassword
 // jsonwebtoken: send by cookie
 
-const login = catchAsync(async (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return next(new AppError("Please provide email and password", 401));
@@ -27,23 +26,23 @@ const login = catchAsync(async (req, res, next) => {
   // save id in refreshToken
   const refreshToken = signToken.signRefreshToken(doc.id);
 
-  await client.set(doc.id, refreshToken, "ex", 365 * 24 * 60 * 60);
+  // await client.set(doc.id, refreshToken, "ex", 365 * 24 * 60 * 60);
   res.status(200).json({
     status: "success",
     message: "Login succesfully!",
     refreshToken,
-    userId: doc.id,
+    userId: doc.id
   });
-});
+};
 const logout = (req, res) => {
   res.cookie("jwt", "logout", {
     maxAge: Date.now(),
-    httpOnly: false,
+    httpOnly: false
   });
 
   res.status(200).json({
     status: "success",
-    message: "Logout succesfully!",
+    message: "Logout succesfully!"
   });
 };
 const isLogin = async (req, res, next) => {
@@ -54,12 +53,12 @@ const isLogin = async (req, res, next) => {
     const decode = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET_KEY);
 
     const currentUser = await User.findById(decode.id);
+
     req.user = currentUser;
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {
       const { refreshToken } = req.body;
-      console.log(refreshToken);
       signToken.verifyRefreshToken(req, res, next, refreshToken);
     } else
       return next(new AppError("Cannot verify with jwt. Login again", 401));
@@ -80,12 +79,13 @@ const updatePassword = catchAsync(async (req, res, next) => {
   signToken.sendCookie(res, newUser.id);
   res.status(200).json({
     status: "success",
-    data: newUser,
+    data: newUser
   });
 });
 const signUp = generalHandle.createOne(User, "user");
 const permission = function (...role) {
   return (req, res, next) => {
+    console.log(req.user);
     if (role.includes(req.user.role)) return next();
     return next(
       new AppError("You are not permission to implement this action", 403)
@@ -105,13 +105,13 @@ const forggotPassword = async (req, res, next) => {
       message: `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${
         req.protocol
       }://${req.get("host")}/resetPassword/${token}.
-    If you didn't forget your password, please ignore this email! `,
+    If you didn't forget your password, please ignore this email! `
     };
     sendEmail(optionsEmail);
 
     res.status(200).json({
       status: "Token send to email successfully!!",
-      token,
+      token
     });
   } catch (err) {
     user.tokenResetPassword = undefined;
@@ -126,7 +126,7 @@ const forggotPassword = async (req, res, next) => {
 const resetPassword = catchAsync(async (req, res, next) => {
   const user = await User.findOne({
     tokenResetPassword: req.params.token,
-    tokenResetPasswordExpire: { $gte: Date.now() },
+    tokenResetPasswordExpire: { $gte: Date.now() }
   });
   if (!user) return next(new AppError("This token is not valid", 403));
   const { newPassword, passwordConfirm } = req.body;
@@ -139,7 +139,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Change password succesfully",
-    user,
+    user
   });
 });
 module.exports = {
@@ -150,5 +150,5 @@ module.exports = {
   updatePassword,
   permission,
   forggotPassword,
-  resetPassword,
+  resetPassword
 };

@@ -5,14 +5,12 @@ const fileUpload = require("../cloudinary.config");
 const reviewRouter = require("./ReviewRoute");
 
 router.use("/:productId/reviews", reviewRouter);
-router
-  .route("/")
-  .get(productController.getAllProduct)
-  .post(
-    authController.permission("seller"),
-    fileUpload.single("imageCover"),
-    productController.createProduct
-  );
+router.route("/").get(productController.getAllProduct).post(
+  authController.isLogin,
+  // authController.permission("seller"),
+  fileUpload.single("imageCover"),
+  productController.createProduct
+);
 router
   .route("/:productId")
   .get(productController.getProduct)

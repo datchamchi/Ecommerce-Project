@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const categoryController = require("./../controllers/CategoryController");
 const fileUpload = require("./../cloudinary.config");
-// const authController = require("./../controllers/authController");
+const authController = require("./../controllers/authController");
 
-// router.use(authController.isLogin, authController.permission("admin"));
+router.use(authController.isLogin, authController.permission("admin"));
 router
   .route("/")
   .get(categoryController.getAllCategory)

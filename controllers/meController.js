@@ -21,7 +21,7 @@ const updateMe = function (...fields) {
       filterObj(req.body, fields);
       const newData = await User.findByIdAndUpdate(req.user.id, req.body, {
         new: true,
-        runValidators: true,
+        runValidators: true
       });
 
       if (req.file && req.file.path !== newData.imageCover) {
@@ -33,7 +33,7 @@ const updateMe = function (...fields) {
       // await newData.save();
       res.status(200).json({
         status: "success",
-        data: newData,
+        data: newData
       });
     } catch (err) {
       if (req.file) {
@@ -51,10 +51,11 @@ const getMe = catchAsync(async (req, res, next) => {
   const data = await User.findById(req.user.id).select("");
   res.status(200).json({
     status: "success",
-    data,
+    data
   });
 });
 module.exports = {
   updateMe,
   getMe,
+  filterObj
 };

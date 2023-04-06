@@ -15,7 +15,7 @@ const createOne = function (Model, ...options) {
       const data = await Model.create(req.body);
       res.status(201).json({
         status: "success",
-        data: data,
+        data: data
       });
     } catch (err) {
       if (req.file) {
@@ -31,7 +31,7 @@ const getAll = function (Model, ...choice) {
     res.status(200).json({
       status: "success",
       length: list.length,
-      data: list,
+      data: list
     });
   });
 };
@@ -47,7 +47,7 @@ const getOne = function (Model, id, popOption, ...choice) {
     }
     res.status(200).json({
       status: "success",
-      data: doc,
+      data: doc
     });
   };
 };
@@ -71,7 +71,7 @@ const updateOne = function (Model, id, ...options) {
       console.log(1, JSON.parse(id));
       const newData = await Model.findOne(id, req.body, {
         new: true,
-        runValidators: true,
+        runValidators: true
       });
 
       if (req.file && req.file.path !== newData.imageCover) {
@@ -83,7 +83,7 @@ const updateOne = function (Model, id, ...options) {
       // await newData.save();
       res.status(200).json({
         status: "success",
-        data: newData,
+        data: newData
       });
     } catch (err) {
       if (req.file) {
@@ -100,7 +100,7 @@ const deleteOne = function (Model, id) {
     if (data.filename) await cloudinary.uploader.destroy(data.filename);
     res.status(204).json({
       status: "success",
-      data: null,
+      data: null
     });
   });
 };
@@ -109,5 +109,5 @@ module.exports = {
   getAll,
   getOne,
   updateOne,
-  deleteOne,
+  deleteOne
 };

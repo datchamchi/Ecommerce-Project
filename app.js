@@ -7,7 +7,7 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 
 const store = new MongoDBStore({
   uri: "mongodb+srv://janedat:dat12345678@cluster0.04bsb4k.mongodb.net/?retryWrites=true&w=majority",
-  collection: "sessions",
+  collection: "sessions"
 });
 
 const bodyParser = require("body-parser");
@@ -42,7 +42,7 @@ app.use(
     saveUninitialized: true,
     store: store,
     unset: "destroy",
-    name: "session cookie name",
+    name: "session cookie name"
   })
 );
 
@@ -55,7 +55,7 @@ app.use("/products", productRouter);
 app.use("/categorys", categoryRouter);
 app.all("*", (req, res) => {
   res.status(400).json({
-    message: "Invalid path",
+    message: "Invalid path"
   });
 });
 app.use(errorHandle);
