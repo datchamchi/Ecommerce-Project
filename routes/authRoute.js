@@ -2,6 +2,7 @@ const router = require("express").Router();
 const authController = require("./../controllers/authController");
 const fileUpload = require("./../cloudinary.config");
 
+router.post("/api/refresh-token", authController.getRefreshToken);
 router.post("/login", authController.login);
 router.post("/logout", authController.logout);
 router.post("/signup", fileUpload.single("imageCover"), authController.signUp);

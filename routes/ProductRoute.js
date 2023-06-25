@@ -6,7 +6,6 @@ const reviewRouter = require("./ReviewRoute");
 
 router.use("/:productId/reviews", reviewRouter);
 router.route("/").get(productController.getAllProduct).post(
-  authController.isLogin,
   // authController.permission("seller"),
   fileUpload.single("imageCover"),
   productController.createProduct

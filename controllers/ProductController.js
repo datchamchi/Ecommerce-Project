@@ -4,6 +4,7 @@ const Product = require("./../models/ProductModel");
 const generalHandle = require("./generalHandle");
 
 const getAllProduct = async (req, res, next) => {
+  console.log(req.session.cartList)
   try {
     const fields = req.query.fields
       ? req.query.fields.split(",").join(" ")
@@ -15,7 +16,7 @@ const getAllProduct = async (req, res, next) => {
     const sort = req.query.sort
       ? req.query.sort.split(",").join(" ")
       : "ratingsAverage sort";
-    console.log(page, limit, skip);
+
     const data = await Product.find()
       .select(fields)
       .skip(skip)

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include('./includes/head.ejs')%>
+        <link rel="stylesheet" href="../css/cart.css">
+</head>
+
+<body>
+    <%- include('./includes/navbar.ejs')%>
+        <% let total=0 ; %>
+            <section id="giohang" class="section-p1">
+                <table width="100%">
+                    <% if (!cartList || cartList.length===0) { %>
+                        <p>No item add to cart</p>
+
+                        <% } else { %>
+                            <thead>
+                                <tr>
+                                    <td>Remove</td>
+                                    <td>Image</td>
+                                    <td>Product</td>
+                                    <td>Size</td>
+                                    <td>Price</td>
+                                    <td>Quantity</td>
+                                    <td>Subtotal</td>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <% cartList.forEach(c=>{
+                                    total += (c.price * c.quantity)
+                                    %>
+                                    <tr>
+
+                                        <td><a href="/cart/remove-product-from-cart?id=<%=c.id%>"><i
+                                                    class=" far fa-times-circle"></i>
+                                            </a></td>
+                                        <td><a href="/products?id=<%=c.id%>">
+                                                <img src="<%=c.imageCover%>"></td>
+
+                                        </a>
+                                        <td>
+                                            <%=c.name%>
+                                        </td>
+                                        <td><select>
+                                                <option>XL</option>
+                                                <option>XXL</option>
+                                                <option>Small</option>
+                                                <option>Large</option>
+                                            </select></td>
+                                        <td>
+                                            $<%=c.price%>
+                                        </td>
+                                        <td>
+                                            <form method="POST" action="/cart/change-quantity">
+                                                <input type="hidden" name="id" value=<%=c.id%> >
+                                                <input type="number" name="quantity" class="quantity"
+                                                    value=<%=c.quantity%>>
+                                            </form>
+
+                                        </td>
+                                        <td>
+                                            $<%=c.price * c.quantity%>
+                                    </tr>
+
+
+
+                                    <% }) %>
+                            </tbody>
+                            <% } %>
+
+
+                </table>
+            </section>
+            <% if ( cartList && cartList.length> 0) { %>
+                <section id="cart-add" class="s-p1">
+                    <div id="subtotal">
+                        <h3>Cart Total</h3>
+                        <table>
+                            <tr>
+                                <td>Cart Subtotal</td>
+                                <td>$<%=total%>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Shipping</td>
+                                <td>$ Free</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><Strong>$<%=total%></Strong></td>
+                            </tr>
+                        </table>
+                        <button class="normal btn--checkout"><a href="/BTL/check-out">Proceed to checkout</a></button>
+                    </div>
+                </section>
+                <%} %>
+                    <%- include("./includes/footer.ejs")%>
+                        <script src="../js/cart.js"></script>
+
+</body>
+
+</html>

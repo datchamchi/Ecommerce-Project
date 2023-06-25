@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include('./includes/head.ejs')%>
+        <link rel="stylesheet" href="../css/login.css">
+</head>
+
+<body>
+    <%- include('./includes/navbar.ejs') %>
+        <section id="login" style="background-color: #fff">
+            <div class="wrapper">
+                <div class="title">Login Form</div>
+                <form id="loginForm" action='#'>
+                    <div class="field login-email">
+                        <input id="login-email" type="text" required>
+                        <label>Email</label>
+                    </div>
+                    <div class="field ">
+                        <input id="login-password" type="password" required>
+                        <label>Password</label>
+                    </div>
+                    <div class="details error "></div>
+
+
+                    <div class="pass-link"><a href="/BTL/forgetPassword">Forgot password?</a></div>
+
+
+                    <div class="signup-link">Not a member? <a href="/BTL/signup">Signup now</a></div>
+                    <input type="submit" value="Login">
+
+                </form>
+            </div>
+        </section>
+        <%- include("./includes/footer.ejs") %>
+            <script src="../js/index.js"></script>
+            <script src="../js/login.js"></script>
+
+
+</body>
+
+</html>

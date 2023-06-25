@@ -53,9 +53,7 @@ const ProductSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-// ProductSchema.virtual("price").get(function () {
-//   return (1 - this.priceSale) * this.priceOrigin;
-// });
+
 
 ProductSchema.pre(/^find/, function (next) {
   this.populate({

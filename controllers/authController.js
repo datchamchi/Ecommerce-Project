@@ -2,10 +2,16 @@ const jwt = require("jsonwebtoken");
 const catchAsync = require("./../utils/catchAsync");
 const generalHandle = require("./generalHandle");
 const AppError = require("./../utils/appError");
-// const client = require("./../utils/initRedis");
+const client = require("./../utils/initRedis");
 const User = require("./../models/UserModel");
 const signToken = require("./../utils/service_token");
 const sendEmail = require("./../utils/sendEmail");
+require("dotenv").config({ path: "config.env" });
+
+const optionCookie = {
+  maxAge: process.env.COOKIE_EXPIRE_IN * 24 * 60 * 60 * 1000,
+  httpOnly: false
+};
 
 require("dotenv").config();
 // authentication : login ,sign in, resetPassword
@@ -22,17 +28,42 @@ const login = async (req, res, next) => {
     return next(new AppError("Incorect Password", 401));
   }
   // req.session.user = doc; // if using session
-  signToken.sendCookie(res, doc.id);
-  // save id in refreshToken
-  const refreshToken = signToken.signRefreshToken(doc.id);
+  try {
+    const accessToken = await signToken.signAccesstoken(doc.id);
+    if (process.env.NODE_ENV === "production") optionCookie.httpOnly = true;
+    res.cookie("accessToken", accessToken, optionCookie);
+    const refreshToken = await signToken.signRefreshToken(doc.id);
+    await client.set(doc.id, refreshToken);
+    await client.expire(doc.id, 365 * 24 * 60 * 60);
+    res.status(200).json({
+      status: "success",
+      message: "Login succesfully!",
+      accessToken,
+      refreshToken,
+      userId: doc.id
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      err
+    });
+  }
 
-  // await client.set(doc.id, refreshToken, "ex", 365 * 24 * 60 * 60);
-  res.status(200).json({
-    status: "success",
-    message: "Login succesfully!",
-    refreshToken,
-    userId: doc.id
-  });
+  // save id in refreshToken
+};
+const getRefreshToken = async (req, res) => {
+  const { id, refreshToken } = req.body;
+  if (!refreshToken)
+    return res.status(403).json({ message: "No refresh token" });
+  if (refreshToken !== (await client.get(id)))
+    return res.status(403).json({ message: "Refresh token is invalid" });
+  const accessToken = await signToken.signAccesstoken(id);
+  if (process.env.NODE_ENV === "production") optionCookie.httpOnly = true;
+  res.cookie("accessToken", accessToken, optionCookie);
+  const newRefreshToken = await signToken.signRefreshToken(id);
+  await client.set(id, newRefreshToken);
+  await client.expire(id, 365 * 24 * 60 * 60);
+  res.status(403).json({ accessToken, newRefreshToken });
 };
 const logout = (req, res) => {
   res.cookie("jwt", "logout", {
@@ -62,6 +93,28 @@ const isLogin = async (req, res, next) => {
       signToken.verifyRefreshToken(req, res, next, refreshToken);
     } else
       return next(new AppError("Cannot verify with jwt. Login again", 401));
+  }
+};
+
+const protect = async (req, res, next) => {
+  try {
+    if (!req.cookies.accessToken) {
+      return next();
+    }
+    const decode = jwt.verify(
+      req.cookies.accessToken,
+      process.env.ACCESS_TOKEN_KEY
+    );
+
+    const currentUser = await User.findById(decode.id);
+
+    req.user = currentUser;
+    return next();
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      const { refreshToken } = await client;
+      signToken.verifyRefreshToken(req, res, next, refreshToken);
+    } else return next();
   }
 };
 const updatePassword = catchAsync(async (req, res, next) => {
@@ -142,6 +195,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
     user
   });
 });
+
 module.exports = {
   login,
   isLogin,
@@ -150,5 +204,7 @@ module.exports = {
   updatePassword,
   permission,
   forggotPassword,
-  resetPassword
+  resetPassword,
+  protect,
+  getRefreshToken
 };
